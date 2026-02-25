@@ -27,6 +27,7 @@ Thumbs.db
 *.json
 !package.json
 !pubspec.json
+!deployment/cors.json
 
 # Docker
 *.log
