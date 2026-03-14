@@ -1,7 +1,7 @@
 [project]
-name = "qissati-backend"
+name = "nimora-backend"
 version = "1.0.0"
-description = "Qissati - Interactive AI Storybook Backend"
+description = "Nimora - Interactive AI Storybook Backend"
 requires-python = ">=3.11"
 
 [tool.pytest.ini_options]

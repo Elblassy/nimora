@@ -11,19 +11,23 @@ class ApiService {
     required String childName,
     required int childAge,
     required String theme,
-    required Uint8List photoBytes,
-    required String photoFileName,
+    required String style,
+    Uint8List? photoBytes,
+    String? photoFileName,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/story/start');
     final request = http.MultipartRequest('POST', uri)
       ..fields['child_name'] = childName
       ..fields['child_age'] = childAge.toString()
       ..fields['theme'] = theme
-      ..files.add(http.MultipartFile.fromBytes(
+      ..fields['style'] = style;
+    if (photoBytes != null) {
+      request.files.add(http.MultipartFile.fromBytes(
         'photo',
         photoBytes,
-        filename: photoFileName,
+        filename: photoFileName ?? 'photo.png',
       ));
+    }
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
     if (response.statusCode != 200) {
@@ -33,6 +37,7 @@ class ApiService {
     return {
       'session_id': data['session_id'] as String,
       'page': StoryPage.fromJson(data['page']),
+      'story_title': data['story_title'] as String? ?? '',
     };
   }
 
@@ -54,6 +59,28 @@ class ApiService {
       'page': StoryPage.fromJson(data['page']),
       'is_complete': data['is_complete'] as bool,
     };
+  }
+
+  /// Poll for audio URL (background-generated on backend)
+  Future<String> pollAudioUrl({
+    required String sessionId,
+    required int pageNumber,
+    int maxRetries = 15,
+  }) async {
+    for (int i = 0; i < maxRetries; i++) {
+      try {
+        final response = await http.get(
+          Uri.parse('$_baseUrl/api/story/$sessionId/audio/$pageNumber'),
+        );
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          final url = data['audio_url'] as String? ?? '';
+          if (url.isNotEmpty) return url;
+        }
+      } catch (_) {}
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    return '';
   }
 
   Future<bool> healthCheck() async {

@@ -1,6 +1,7 @@
-"""Qissati Backend - FastAPI entry point."""
+"""Nimora Backend - FastAPI entry point."""
 
 import logging
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -14,11 +15,28 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 settings = get_settings()
+local_storage = Path("local_storage")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("Nimora backend starting...")
+    logger.info(f"Interleaved model: {settings.interleaved_model}")
+    logger.info(f"Text model: {settings.orchestrator_model}")
+    local_storage.mkdir(parents=True, exist_ok=True)
+    # Mount local storage for serving generated images
+    app.mount("/local_storage", StaticFiles(directory="local_storage"), name="local_storage")
+    yield
+    # Shutdown
+    logger.info("Nimora backend shutting down...")
+
 
 app = FastAPI(
-    title="Qissati API",
+    title="Nimora API",
     description="Interactive AI Storybook for Children",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # CORS middleware
@@ -32,20 +50,6 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(router)
-
-# Serve local storage files in development
-local_storage = Path("local_storage")
-if local_storage.exists():
-    app.mount("/local_storage", StaticFiles(directory="local_storage"), name="local_storage")
-
-
-@app.on_event("startup")
-async def startup():
-    logger.info("Qissati backend starting...")
-    logger.info(f"Primary image model: {settings.primary_image_model}")
-    logger.info(f"Fallback image model: {settings.fallback_image_model}")
-    # Ensure local storage dir exists
-    local_storage.mkdir(parents=True, exist_ok=True)
 
 
 if __name__ == "__main__":

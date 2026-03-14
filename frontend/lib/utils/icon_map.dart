@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+const Map<String, IconData> faIconMap = {
+  'chess-rook': FontAwesomeIcons.solidChessRook,
+  'dragon': FontAwesomeIcons.dragon,
+  'wand-magic-sparkles': FontAwesomeIcons.wandMagicSparkles,
+  'person-running': FontAwesomeIcons.personRunning,
+  'leaf': FontAwesomeIcons.leaf,
+  'mountain': FontAwesomeIcons.mountain,
+  'fire': FontAwesomeIcons.fire,
+  'star': FontAwesomeIcons.solidStar,
+  'gem': FontAwesomeIcons.solidGem,
+  'key': FontAwesomeIcons.key,
+  'map-location-dot': FontAwesomeIcons.mapLocationDot,
+  'dove': FontAwesomeIcons.dove,
+  'water': FontAwesomeIcons.water,
+  'shield-halved': FontAwesomeIcons.shieldHalved,
+  'eye-slash': FontAwesomeIcons.solidEyeSlash,
+  'comment': FontAwesomeIcons.solidComment,
+  'handshake': FontAwesomeIcons.solidHandshake,
+  'campground': FontAwesomeIcons.campground,
+  'bridge-water': FontAwesomeIcons.bridgeWater,
+  'dungeon': FontAwesomeIcons.dungeon,
+  'sailboat': FontAwesomeIcons.sailboat,
+  'apple-whole': FontAwesomeIcons.appleWhole,
+  'compass': FontAwesomeIcons.solidCompass,
+  'route': FontAwesomeIcons.route,
+  'location-arrow': FontAwesomeIcons.locationArrow,
+  'house': FontAwesomeIcons.solidHouse,
+  'car': FontAwesomeIcons.car,
+  'heart': FontAwesomeIcons.solidHeart,
+  'music': FontAwesomeIcons.music,
+  'book': FontAwesomeIcons.book,
+  'feather': FontAwesomeIcons.feather,
+  'hat-wizard': FontAwesomeIcons.hatWizard,
+  'scroll': FontAwesomeIcons.scroll,
+  'ghost': FontAwesomeIcons.ghost,
+  'paw': FontAwesomeIcons.paw,
+  'fish': FontAwesomeIcons.fish,
+  'tree': FontAwesomeIcons.tree,
+  'cloud': FontAwesomeIcons.solidCloud,
+  'sun': FontAwesomeIcons.solidSun,
+  'moon': FontAwesomeIcons.solidMoon,
+  'bolt': FontAwesomeIcons.bolt,
+  'snowflake': FontAwesomeIcons.solidSnowflake,
+  'rainbow': FontAwesomeIcons.rainbow,
+  'arrow-right': FontAwesomeIcons.arrowRight,
+};
+
+IconData getIconData(String iconName) {
+  return faIconMap[iconName] ?? FontAwesomeIcons.solidCompass;
+}

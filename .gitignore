@@ -19,6 +19,10 @@ frontend/.flutter-plugins-dependencies
 .vscode/
 *.swp
 
+# Claude
+.claude/
+docs/plans/
+
 # OS
 .DS_Store
 Thumbs.db
@@ -28,6 +32,12 @@ Thumbs.db
 !package.json
 !pubspec.json
 !deployment/cors.json
+
+# Local storage (generated stories, images, audio)
+backend/local_storage/
+
+# Archives
+*.zip
 
 # Docker
 *.log

@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-qissati-hackathon}"
+PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-nimora-hackathon}"
 REGION="${GOOGLE_CLOUD_LOCATION:-us-central1}"
-BACKEND_SERVICE="qissati-backend"
-FRONTEND_SERVICE="qissati-frontend"
+BACKEND_SERVICE="nimora-backend"
+FRONTEND_SERVICE="nimora-frontend"
 
-echo "=== Deploying Qissati to Google Cloud Run ==="
+echo "=== Deploying Nimora to Google Cloud Run ==="
 echo "Project: $PROJECT_ID"
 echo "Region: $REGION"
 
@@ -20,8 +20,8 @@ gcloud services enable run.googleapis.com \
 
 # Create GCS bucket if it doesn't exist
 echo "Setting up Cloud Storage..."
-gsutil mb -p $PROJECT_ID -l $REGION gs://qissati-stories 2>/dev/null || true
-gsutil cors set deployment/cors.json gs://qissati-stories
+gsutil mb -p $PROJECT_ID -l $REGION gs://nimora-stories 2>/dev/null || true
+gsutil cors set deployment/cors.json gs://nimora-stories
 
 # Deploy backend
 echo "Deploying backend..."
@@ -32,7 +32,7 @@ gcloud run deploy $BACKEND_SERVICE \
   --allow-unauthenticated \
   --memory 1Gi \
   --timeout 120 \
-  --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=$REGION,GCS_BUCKET_NAME=qissati-stories"
+  --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=$REGION,GCS_BUCKET_NAME=nimora-stories"
 
 # Get backend URL
 BACKEND_URL=$(gcloud run services describe $BACKEND_SERVICE --region $REGION --project $PROJECT_ID --format='value(status.url)')

@@ -6,12 +6,14 @@ class ChildInfo {
   final Uint8List? photoBytes;
   final String? photoFileName;
   final String theme;
+  final String style;
 
   ChildInfo({
     required this.name,
     required this.age,
     this.photoBytes,
     this.photoFileName,
-    this.theme = 'adventure',
+    this.theme = 'forest_journey',
+    this.style = 'watercolor',
   });
 }

@@ -1,4 +1,4 @@
-name: qissati
+name: nimora
 description: Interactive AI Storybook for Children
 
 publish_to: 'none'
@@ -14,14 +14,34 @@ dependencies:
   go_router: ^17.1.0
   cached_network_image: ^3.4.1
   shimmer: ^3.0.0
-  google_fonts: ^8.0.2
   file_picker: ^10.3.10
   mime: ^2.0.0
+  pdf: ^3.11.3
+  web: ^1.1.1
+  flutter_svg: ^2.2.3
+  font_awesome_flutter: ^10.9.0
+  image: ^4.5.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
+  shaders:
+    - shaders/mesh_gradient.frag
+  assets:
+    - assets/images/components/
+    - assets/images/logo/
+    - assets/images/nimora_fox/
+    - assets/images/adventure/
+    - assets/images/look/
+
+  fonts:
+    - family: Fredoka
+      fonts:
+        - asset: assets/fonts/Fredoka-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Fredoka-SemiBold.ttf
+          weight: 600

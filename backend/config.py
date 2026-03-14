@@ -3,16 +3,15 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    google_api_key: str = ""
-    gcs_bucket_name: str = "qissati-stories"
-    google_cloud_project: str = "qissati-hackathon"
+    google_api_key: str = "AIzaSyCsIQGeTyBMuza3hEINFYqtkc-bfvAOsCY"
+    gcs_bucket_name: str = "nimora-stories"
+    google_cloud_project: str = "nimora-hackathon"
     google_cloud_location: str = "us-central1"
     frontend_url: str = "http://localhost:8080"
     port: int = 8000
 
-    # Image generation models (ordered by preference)
-    primary_image_model: str = "gemini-2.0-flash-preview-image-generation"
-    fallback_image_model: str = "gemini-2.0-flash-preview-image-generation"
+    # Interleaved model (TEXT + IMAGE in single call)
+    interleaved_model: str = "gemini-2.5-flash-image"
     orchestrator_model: str = "gemini-2.5-flash"
 
     # Story settings

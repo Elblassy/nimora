@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/story_provider.dart';
 import '../widgets/story_page_widget.dart';
-import '../widgets/choice_buttons.dart';
 import '../widgets/loading_magic.dart';
 import '../theme/app_theme.dart';
 
@@ -13,8 +12,8 @@ class StoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Consumer<StoryProvider>(
+      backgroundColor: Colors.transparent,
+      body: Consumer<StoryProvider>(
           builder: (context, provider, _) {
             if (provider.state == StoryState.loading) {
               return const LoadingMagic();
@@ -42,10 +41,7 @@ class StoryScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
-                        onPressed: () {
-                          provider.reset();
-                          context.go('/');
-                        },
+                        onPressed: () => provider.retry(),
                         child: const Text('Try Again'),
                       ),
                     ],
@@ -66,24 +62,14 @@ class StoryScreen extends StatelessWidget {
               return const LoadingMagic();
             }
 
-            return Column(
-              children: [
-                Expanded(
-                  child: StoryPageWidget(page: currentPage),
-                ),
-                if (currentPage.choices.isNotEmpty)
-                  ChoiceButtons(
-                    choices: currentPage.choices,
-                    onChoiceSelected: (index) {
-                      provider.makeChoice(index);
-                    },
-                  ),
-                const SizedBox(height: 8),
-              ],
+            return StoryPageWidget(
+              page: currentPage,
+              onChoiceSelected: (index) {
+                provider.makeChoice(index);
+              },
             );
           },
         ),
-      ),
     );
   }
 }
