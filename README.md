@@ -77,7 +77,7 @@ The result: a parent uploads a photo, the child picks a theme, and within second
 ### Quick Start (Docker — recommended)
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/nimora.git
+git clone https://github.com/elblassy/nimora.git
 cd nimora
 
 # Add your Gemini API key
