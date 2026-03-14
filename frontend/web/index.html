@@ -1,46 +1,280 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Nimora — Every child is the hero of their story">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="frontend">
+  <meta name="apple-mobile-web-app-title" content="Nimora">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.ico"/>
+  <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 
   <title>Nimora</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0e0b24;
+    }
+
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
+
+    #splash.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #splash-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+
+    .splash-content {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .splash-logo {
+      height: 80px;
+      width: auto;
+      margin-bottom: 16px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .splash-tagline {
+      font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 48px;
+    }
+
+    .splash-loader {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #FF6B35;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @font-face {
+      font-family: 'Fredoka';
+      src: url('assets/fonts/Fredoka-SemiBold.ttf') format('truetype');
+      font-weight: 600;
+    }
+
+    @font-face {
+      font-family: 'Fredoka';
+      src: url('assets/fonts/Fredoka-Regular.ttf') format('truetype');
+      font-weight: 400;
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="splash">
+    <canvas id="splash-canvas"></canvas>
+    <div class="splash-content">
+      <img src="nimora_logo.svg" alt="Nimora" class="splash-logo" />
+      <div class="splash-tagline">Every child is the hero of their story</div>
+      <div class="splash-loader"></div>
+    </div>
+  </div>
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <script>
+  // Mesh gradient — identical shader & physics to the Flutter app
+  (function () {
+    'use strict';
+
+    const canvas = document.getElementById('splash-canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+    if (!gl) {
+      canvas.style.background = 'linear-gradient(135deg, #1f1843, #693c72, #3778ac)';
+      return;
+    }
+
+    const VERT = `
+      attribute vec2 a_pos;
+      void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+    `;
+
+    const FRAG = `
+      precision highp float;
+      uniform vec2  u_res;
+      uniform vec2  u_pts[6];
+      uniform vec3  u_cols[6];
+
+      void main() {
+        vec2 uv = gl_FragCoord.xy / u_res;
+        float aspect = u_res.x / u_res.y;
+        vec2 st = vec2(uv.x * aspect, uv.y);
+
+        vec3 colour  = vec3(0.0);
+        float totalW = 0.0;
+
+        for (int i = 0; i < 6; i++) {
+          vec2 pt = vec2(u_pts[i].x * aspect, u_pts[i].y);
+          float d = distance(st, pt);
+          float w = 1.0 / pow(d + 0.0001, 3.0);
+          colour += u_cols[i] * w;
+          totalW += w;
+        }
+
+        colour /= totalW;
+        gl_FragColor = vec4(colour, 1.0);
+      }
+    `;
+
+    function makeShader(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    }
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, makeShader(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(prog, makeShader(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1
+    ]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(prog, 'a_pos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    const uRes = gl.getUniformLocation(prog, 'u_res');
+    const uPts = [], uCols = [];
+    for (let i = 0; i < 6; i++) {
+      uPts.push(gl.getUniformLocation(prog, 'u_pts[' + i + ']'));
+      uCols.push(gl.getUniformLocation(prog, 'u_cols[' + i + ']'));
+    }
+
+    const colours = [
+      [0.216, 0.471, 0.675],
+      [0.216, 0.471, 0.675],
+      [0.412, 0.235, 0.447],
+      [0.412, 0.235, 0.447],
+      [0.122, 0.094, 0.263],
+      [0.122, 0.094, 0.263],
+    ];
+    for (let i = 0; i < 6; i++) gl.uniform3fv(uCols[i], colours[i]);
+
+    // Random spread
+    const pts = [];
+    for (let i = 0; i < 6; i++) {
+      let x, y, ok;
+      do {
+        x = 0.1 + Math.random() * 0.8;
+        y = 0.1 + Math.random() * 0.8;
+        ok = true;
+        for (const p of pts) {
+          if (Math.sqrt((x - p.x) ** 2 + (y - p.y) ** 2) < 0.3) { ok = false; break; }
+        }
+      } while (!ok);
+      const angle = Math.random() * Math.PI * 2;
+      pts.push({ x, y, vx: Math.cos(angle) * 0.0004, vy: Math.sin(angle) * 0.0004 });
+    }
+
+    const MIN_DIST = 0.392, REPEL = 0.00015, MAX_SPD = 0.0006, MIN_SPD = 0.0003, RET = 0.00002;
+
+    function simulate() {
+      for (let i = 0; i < 6; i++) {
+        for (let j = i + 1; j < 6; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < MIN_DIST && d > 0.001) {
+            const f = (MIN_DIST - d) * REPEL, nx = dx / d, ny = dy / d;
+            pts[i].vx += nx * f; pts[i].vy += ny * f;
+            pts[j].vx -= nx * f; pts[j].vy -= ny * f;
+          }
+        }
+      }
+      for (const p of pts) {
+        if (p.x < 0) p.vx += -p.x * RET * 10;
+        if (p.x > 1) p.vx -= (p.x - 1) * RET * 10;
+        if (p.y < 0) p.vy += -p.y * RET * 10;
+        if (p.y > 1) p.vy -= (p.y - 1) * RET * 10;
+        if (p.x < 0.1) p.vx += (0.1 - p.x) * RET;
+        if (p.x > 0.9) p.vx -= (p.x - 0.9) * RET;
+        if (p.y < 0.1) p.vy += (0.1 - p.y) * RET;
+        if (p.y > 0.9) p.vy -= (p.y - 0.9) * RET;
+        const spd = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+        if (spd > MAX_SPD) { p.vx = p.vx / spd * MAX_SPD; p.vy = p.vy / spd * MAX_SPD; }
+        else if (spd < MIN_SPD) {
+          if (spd > 0.00001) { p.vx = p.vx / spd * MIN_SPD; p.vy = p.vy / spd * MIN_SPD; }
+          else { const a = Math.random() * Math.PI * 2; p.vx = Math.cos(a) * MIN_SPD; p.vy = Math.sin(a) * MIN_SPD; }
+        }
+        p.x += p.vx; p.y += p.vy;
+      }
+    }
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let running = true;
+    function frame() {
+      if (!running) return;
+      simulate();
+      for (let i = 0; i < 6; i++) gl.uniform2f(uPts[i], pts[i].x, pts[i].y);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    // Splash is removed from Dart after asset precaching completes.
+    // Watch for removal to stop the render loop.
+    const observer = new MutationObserver(function () {
+      if (!document.getElementById('splash')) {
+        running = false;
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, { childList: true });
+  })();
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
