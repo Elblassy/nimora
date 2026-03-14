@@ -3,7 +3,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    google_api_key: str = "AIzaSyCsIQGeTyBMuza3hEINFYqtkc-bfvAOsCY"
+    google_api_key: str = ""
     gcs_bucket_name: str = "nimora-stories"
     google_cloud_project: str = "nimora-hackathon"
     google_cloud_location: str = "us-central1"
