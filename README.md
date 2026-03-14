@@ -306,6 +306,10 @@ Built for the **Gemini Live Agent Challenge — Creative Storyteller** track.
 - **UI/UX Design** — [Ahmed Elblasy](https://elblasy.com)
 - **Development** — [Muhammad Elblasy](https://elblasy.app)
 
+### Special Thanks
+
+- [Ahmed Youssef](https://be.net/ahmedjoo) — Demo video production
+
 ## License
 
 MIT
