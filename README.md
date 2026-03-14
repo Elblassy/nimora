@@ -72,6 +72,39 @@ The result: a parent uploads a photo, the child picks a theme, and within second
 | **Storage** | Google Cloud Storage (illustrations + audio only) |
 | **Containerization** | Docker + Docker Compose |
 
+## Reproducible Testing
+
+### Quick Start (Docker — recommended)
+```bash
+# Clone the repo
+git clone https://github.com/YOUR_USERNAME/nimora.git
+cd nimora
+
+# Add your Gemini API key
+echo "GOOGLE_API_KEY=your-key-here" > backend/.env
+
+# Run the full stack
+docker-compose up --build
+```
+Open **http://localhost:8080** in Chrome.
+
+### How to test:
+1. Click **Start**
+2. Upload any child's photo (or skip — the app works without one)
+3. Enter a hero name
+4. Pick an adventure theme and art style
+5. Read the first page — listen to the audio narration by clicking the speaker icon
+6. Choose what happens next from the 3 choices
+7. Continue for 5-6 pages until the story ends
+8. Download the completed story as a **PDF**
+
+### What to look for:
+- Each illustration features the child's likeness from their uploaded photo
+- Every playthrough produces a different story based on choices
+- Text and images are generated together in a single Gemini call (interleaved output)
+- Audio narration is generated via Gemini TTS
+- The PDF storybook preserves all illustrations and text
+
 ## Prerequisites
 
 - Python 3.11+
