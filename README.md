@@ -308,7 +308,7 @@ Built for the **Gemini Live Agent Challenge — Creative Storyteller** track.
 
 ### Special Thanks
 
-- [Ahmed Youssef](https://be.net/ahmedjoo) — Demo video production
+- **Video Editing** — [Ahmed Youssef](https://be.net/ahmedjoo)
 
 ## License
 
