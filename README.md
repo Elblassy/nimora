@@ -1,6 +1,6 @@
-# Nimora (نيمورا)
+# Nimora
 
-**Every child is the hero of their story** | كل طفل بطل قصته
+**Every child is the hero of their story**
 
 An interactive AI-powered storybook app where parents upload their child's photo, and Gemini generates a personalized, illustrated story with the child as the hero. Built for the **Gemini Live Agent Challenge — Creative Storyteller** track.
 
