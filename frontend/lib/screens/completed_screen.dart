@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/story_provider.dart';
@@ -19,6 +20,32 @@ class CompletedScreen extends StatefulWidget {
 class _CompletedScreenState extends State<CompletedScreen> {
   bool _isGeneratingPdf = false;
   String _pdfStatus = '';
+  late PageController _pageController;
+  int _currentPage = 0;
+  int _totalPages = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final pages = context.read<StoryProvider>().pages;
+    _totalPages = pages.length;
+    _currentPage = _totalPages - 1;
+    _pageController = PageController(initialPage: _currentPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _goToPage(int page) {
+    _pageController.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+    );
+  }
 
   Future<void> _startPdfDownload(StoryProvider provider) async {
     if (_isGeneratingPdf) return;
@@ -70,6 +97,22 @@ class _CompletedScreenState extends State<CompletedScreen> {
     }
   }
 
+  Widget _buildArrow({required bool isLeft, required bool isDesktop}) {
+    return GestureDetector(
+      onTap: () => _goToPage(_currentPage + (isLeft ? -1 : 1)),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Transform.flip(
+          flipX: isLeft,
+          child: SvgPicture.asset(
+            'assets/images/components/arrow.svg',
+            height: isDesktop ? 80 : 50,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -87,16 +130,39 @@ class _CompletedScreenState extends State<CompletedScreen> {
               Column(
                 children: [
                   Expanded(
-                    child: PageView.builder(
-                      clipBehavior: Clip.none,
-                      scrollBehavior: ScrollConfiguration.of(context).copyWith(
-                        dragDevices: PointerDeviceKind.values.toSet(),
-                      ),
-                      controller: PageController(initialPage: pages.length - 1),
-                      itemCount: pages.length,
-                      itemBuilder: (context, index) {
-                        return StoryPageWidget(page: pages[index]);
-                      },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // PageView
+                        PageView.builder(
+                          clipBehavior: Clip.none,
+                          scrollBehavior: ScrollConfiguration.of(context).copyWith(
+                            dragDevices: PointerDeviceKind.values.toSet(),
+                          ),
+                          controller: _pageController,
+                          itemCount: pages.length,
+                          onPageChanged: (index) {
+                            setState(() => _currentPage = index);
+                          },
+                          itemBuilder: (context, index) {
+                            return StoryPageWidget(page: pages[index]);
+                          },
+                        ),
+
+                        // Left arrow (hidden on first page)
+                        if (isDesktop && _currentPage > 0)
+                          Positioned(
+                            left: 16,
+                            child: _buildArrow(isLeft: true, isDesktop: isDesktop),
+                          ),
+
+                        // Right arrow (hidden on last page)
+                        if (isDesktop && _currentPage < _totalPages - 1)
+                          Positioned(
+                            right: 16,
+                            child: _buildArrow(isLeft: false, isDesktop: isDesktop),
+                          ),
+                      ],
                     ),
                   ),
                   Padding(

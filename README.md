@@ -6,6 +6,12 @@ An interactive AI-powered storybook app where parents upload their child's photo
 
 ---
 
+## Demo Video
+
+[![Nimora Demo](https://img.youtube.com/vi/ZAKxiMdbhGM/maxresdefault.jpg)](https://youtu.be/ZAKxiMdbhGM)
+
+---
+
 ## Screenshots
 
 ### Welcome
